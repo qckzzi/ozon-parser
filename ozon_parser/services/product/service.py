@@ -18,11 +18,16 @@ class ProductService:
     def __str__(self) -> str:
         return f"[{self.__class__.__name__}]"
 
-    async def __call__(self, url: AnyHttpUrl, logger: ILogger | None = None):
-        logger.debug(f"{self} processes {url=}")
+    async def __call__(self, url: AnyHttpUrl, logger: ILogger | None = None) -> None:
+        if logger:
+            logger.debug(f"{self} processes {url=}")
+
         html: str = await self.html_getter.get_html(url=url.unicode_string(), logger=logger)
         product: IProduct = self.parser.parse(html)
-        logger.debug(f"{self} got '{product.name}' product")
+
+        if logger:
+            logger.debug(f"{self} got '{product.name}' product")
+
         await self.publisher.publish(
             {
                 "name": product.name,

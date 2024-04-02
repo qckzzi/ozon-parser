@@ -14,4 +14,6 @@ class ParsedProductMQPublisher:
 
     async def publish(self, product: IProduct, logger: ILogger | None = None) -> None:
         await self.broker.publish(json.dumps(product), queue=self.parsed_loading_queue)
-        logger.debug(f"{self} published '{product["name"]}' product")
+
+        if logger:
+            logger.debug(f"{self} published '{product["name"]}' product")

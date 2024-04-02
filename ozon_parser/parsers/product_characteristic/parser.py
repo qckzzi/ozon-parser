@@ -19,7 +19,7 @@ class ProductCharacteristicsParser:
         characteristics: list[Characteristic] = []
 
         for raw_characteristic in raw_characteristics:
-            tag_strings: set[str] = list(filter(lambda x: x not in (" ,", ", "), list(raw_characteristic.strings)))
+            tag_strings: list[str] = list(filter(lambda x: x not in (" ,", ", "), list(raw_characteristic.strings)))
             characteristics_real_count: int = len(tag_strings) - 1
 
             name: str = tag_strings[0]

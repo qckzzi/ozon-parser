@@ -3,7 +3,7 @@ from faker import Faker
 
 
 @pytest.fixture(name="html")
-def html_fixture(faker: Faker):
+def html_fixture(faker: Faker) -> str:
     html: str = f"""
     <!-- index.html -->
 
