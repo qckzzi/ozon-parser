@@ -1,10 +1,10 @@
-from typing import Protocol
+from typing import Any, Protocol
 
 from pydantic import AnyHttpUrl
 
 
 class ILogger(Protocol):
-    def debug(self, msg: str) -> None: ...
+    def debug(self, msg: str, *args: Any, **kwargs: Any) -> None: ...
 
 
 class IService(Protocol):

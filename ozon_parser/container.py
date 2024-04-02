@@ -18,7 +18,7 @@ from ozon_parser.services.product.service import ProductService
 
 
 class Container(Bakery):
-    settings: Settings = Cake(Settings)
+    settings: Settings = Cake(Settings)  # type: ignore[assignment]
 
     broker: RabbitBroker = Cake(RabbitBroker, settings.amqp_dsn_str)
     _parsed_product_mq_publisher: ParsedProductMQPublisher = Cake(

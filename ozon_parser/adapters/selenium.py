@@ -2,7 +2,7 @@ from backoff import expo, on_exception
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium_async import run_sync
 from selenium_async.pool import Pool
@@ -21,17 +21,18 @@ class SeleniumClient:
         return f"[{self.__class__.__name__}]"
 
     async def get_html(self, url: str, logger: ILogger | None = None) -> str:
-        logger.debug(f"{self} fetches html from {url=}")
+        if logger:
+            logger.debug(f"{self} fetches html from {url=}")
 
-        @on_exception(expo, TimeoutException, max_tries=3, logger=logger)
-        def _get_html(driver: WebDriver):
+        @on_exception(expo, TimeoutException, max_tries=3, logger=logger)  # type: ignore[arg-type]
+        def _get_html(driver: WebDriver) -> str:
             driver.get(url)
             driver.get(url)
             WebDriverWait(driver, self.timeout).until(
-                EC.presence_of_element_located((By.XPATH, '//div[@id="section-characteristics"]')),
+                ec.presence_of_element_located((By.XPATH, '//div[@id="section-characteristics"]')),
             )
             WebDriverWait(driver, self.timeout).until(
-                EC.presence_of_element_located((By.XPATH, '//div[@id="section-description"]')),
+                ec.presence_of_element_located((By.XPATH, '//div[@id="section-description"]')),
             )
 
             return driver.page_source
