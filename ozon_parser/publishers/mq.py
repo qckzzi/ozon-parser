@@ -1,5 +1,3 @@
-import json
-
 from ozon_parser.interfaces import ILogger
 from ozon_parser.publishers.interfaces import IMQBroker, IProduct
 
@@ -13,7 +11,7 @@ class ParsedProductMQPublisher:
         return f"[{self.__class__.__name__}]"
 
     async def publish(self, product: IProduct, logger: ILogger | None = None) -> None:
-        await self.broker.publish(json.dumps(product), queue=self.parsed_loading_queue)
+        await self.broker.publish(product, queue=self.parsed_loading_queue)
 
         if logger:
             logger.debug(f"{self} published '{product["name"]}' product")

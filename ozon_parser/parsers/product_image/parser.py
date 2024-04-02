@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 
 class ProductImagesParser:
@@ -7,7 +7,8 @@ class ProductImagesParser:
 
     def parse(self, html: str) -> list[str]:
         soup: BeautifulSoup = BeautifulSoup(html, "html.parser")
-        low_quality_image_links: list[str] = [x.attrs["src"] for x in soup.find_all("img", class_="ju b900-a")]
+        images_block: Tag = soup.find("div", attrs={"data-widget": "webGallery"})
+        low_quality_image_links: list[str] = [x.attrs["src"] for x in images_block.find_all("img", class_="b900-a")]
         hight_quality_image_links: list[str] = []
 
         for link in low_quality_image_links:
