@@ -7,11 +7,17 @@ repos:
         language: system
         entry: poetry run absolufy-imports
         types: [python]
-      - id: ruff
-        name: ruff
+      - id: ruff-check
+        name: ruff-check
         stages: [commit]
         language: system
         entry: poetry run ruff check
+        types: [python]
+      - id: ruff-format
+        name: ruff-format
+        stages: [commit]
+        language: system
+        entry: poetry run ruff format
         types: [python]
       - id: mypy
         name: mypy

@@ -4,9 +4,9 @@ RUN pip install poetry
 COPY poetry.lock pyproject.toml ./
 RUN poetry install --only main --no-root
 
-COPY src /app
-WORKDIR /app
+COPY ozon_parser /ozon_parser
 
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-CMD ["python", "main.py"]
+ENTRYPOINT ["poetry", "run", "faststream", "run", "ozon_parser/main:app", "--log-level", "debug"]
