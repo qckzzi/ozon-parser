@@ -140,3 +140,7 @@ setup_local.sh
 # End of https://www.gitignore.io/api/python
 
 junit.xml
+
+# Selenium
+geckodriver
+firefox/
