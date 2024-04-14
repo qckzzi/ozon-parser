@@ -38,6 +38,7 @@ class IPublishedProduct(TypedDict):
     description: str
     characteristics: Sequence[IPublishedCharacteristic]
     images: Sequence[str]
+    url: str
 
 
 class IPublisher(Protocol):

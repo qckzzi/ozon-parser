@@ -11,7 +11,9 @@ class ProductMainDataParser:
 
     def parse(self, html: str) -> ProductMainData:
         soup: BeautifulSoup = BeautifulSoup(html, "html.parser")
-        main_data: dict = json.loads(soup.find("script", attrs={"type": "application/ld+json"}).text)
+        main_data: dict = json.loads(
+            soup.find("script", attrs={"type": "application/ld+json"}).text,  # type: ignore[union-attr]
+        )
         title: str = main_data["name"]
         description: str = main_data["description"]
         brand: str = main_data["brand"]

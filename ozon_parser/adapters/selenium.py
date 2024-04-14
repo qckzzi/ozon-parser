@@ -4,8 +4,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium_async import run_sync
-from selenium_async.pool import Pool
+from selenium_async import run_sync  # type: ignore[import-untyped]
+from selenium_async.pool import Pool  # type: ignore[import-untyped]
 
 from ozon_parser.interfaces import ILogger
 

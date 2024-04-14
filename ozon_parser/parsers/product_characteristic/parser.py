@@ -9,7 +9,7 @@ class ProductCharacteristicsParser:
 
     def parse(self, html: str) -> list[Characteristic]:
         soup: BeautifulSoup = BeautifulSoup(html, "html.parser")
-        raw_characteristics: list[Tag] = soup.find(
+        raw_characteristics: list[Tag] = soup.find(  # type: ignore[assignment, union-attr]
             "div",
             attrs={"id": "section-characteristics"},
         ).find_all(
@@ -27,7 +27,7 @@ class ProductCharacteristicsParser:
             for i in range(characteristics_real_count):
                 value: str = tag_strings[i + 1]
 
-                if value == ": ":
+                if value == ": " or not value.strip():
                     continue
 
                 characteristics.append(Characteristic(name=name, value=value))
