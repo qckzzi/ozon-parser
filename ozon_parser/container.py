@@ -2,7 +2,7 @@ from collections.abc import Mapping, Sequence
 
 from bakery import Bakery, Cake
 from faststream.rabbit import RabbitBroker, RabbitQueue, RabbitRoute, RabbitRouter
-from selenium_async.pool import Pool
+from selenium_async.pool import Pool  # type: ignore[import-untyped]
 
 from ozon_parser.adapters.selenium import SeleniumClient
 from ozon_parser.config import Settings

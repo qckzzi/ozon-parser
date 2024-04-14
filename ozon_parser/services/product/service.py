@@ -36,6 +36,7 @@ class ProductService:
                 "description": product.description,
                 "images": product.images,
                 "sku": product.sku,
+                "url": str(url),
             },
             logger,
         )
