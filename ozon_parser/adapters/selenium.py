@@ -1,10 +1,7 @@
-from backoff import expo, on_exception
-from selenium.common.exceptions import TimeoutException
+from selenium.webdriver import Firefox, FirefoxOptions, FirefoxService
 from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium_async import run_sync  # type: ignore[import-untyped]
 from selenium_async.pool import Pool  # type: ignore[import-untyped]
 
 from ozon_parser.interfaces import ILogger
@@ -24,22 +21,23 @@ class SeleniumClient:
         if logger:
             logger.debug(f"{self} fetches html from {url=}")
 
-        @on_exception(expo, TimeoutException, max_tries=3, logger=logger)  # type: ignore[arg-type]
-        def _get_html(driver: WebDriver) -> str:
-            driver.get(url)
-            driver.get(url)
-            WebDriverWait(driver, self.timeout).until(
-                ec.presence_of_element_located((By.XPATH, '//div[@id="section-characteristics"]')),
-            )
-            WebDriverWait(driver, self.timeout).until(
-                ec.presence_of_element_located((By.XPATH, '//div[@id="section-description"]')),
-            )
+        firefox_options = FirefoxOptions()
+        firefox_options.add_argument("--headless")
 
-            return driver.page_source
+        firefox_options.binary_location = self.binary_location
 
-        return await run_sync(
-            _get_html,
-            pool=self.pool,
-            executable_path=self.executable_path,
-            binary_location=self.binary_location,
+        driver: Firefox = Firefox(
+            options=firefox_options,
+            service=FirefoxService(executable_path=self.executable_path),
         )
+
+        driver.get(url)
+        driver.get(url)
+        WebDriverWait(driver, self.timeout).until(
+            ec.presence_of_element_located((By.XPATH, '//div[@id="section-characteristics"]')),
+        )
+        WebDriverWait(driver, self.timeout).until(
+            ec.presence_of_element_located((By.XPATH, '//div[@id="section-description"]')),
+        )
+
+        return driver.page_source
