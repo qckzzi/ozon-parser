@@ -27,4 +27,8 @@ class SellerService:
         product_urls: Sequence[str] = await self.seller_parser.parse(url.unicode_string(), logger)
 
         for p_url in product_urls:
-            await self.product_service(Url(p_url), logger)
+            try:
+                await self.product_service(Url(p_url), logger)
+            except Exception:  # noqa: BLE001
+                if logger:
+                    logger.exception("Found an error while product processing")
