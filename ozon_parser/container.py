@@ -4,7 +4,8 @@ from bakery import Bakery, Cake
 from faststream.rabbit import RabbitBroker, RabbitQueue, RabbitRoute, RabbitRouter
 from selenium_async.pool import Pool  # type: ignore[import-untyped]
 
-from ozon_parser.adapters.selenium import SeleniumClient
+from ozon_parser.adapters.product_html_getter import ProductHtmlGetter
+from ozon_parser.adapters.seller_html_getter import SellerHtmlGetter
 from ozon_parser.config import Settings
 from ozon_parser.handler import ParsingHandler
 from ozon_parser.interfaces import IService
@@ -13,8 +14,10 @@ from ozon_parser.parsers.product.parser import ProductParser
 from ozon_parser.parsers.product_characteristic.parser import ProductCharacteristicsParser
 from ozon_parser.parsers.product_image.parser import ProductImagesParser
 from ozon_parser.parsers.product_main_data.parser import ProductMainDataParser
+from ozon_parser.parsers.seller.parser import SellerParser
 from ozon_parser.publishers.mq import ParsedProductMQPublisher
 from ozon_parser.services.product.service import ProductService
+from ozon_parser.services.seller.service import SellerService
 
 
 class Container(Bakery):
@@ -28,8 +31,15 @@ class Container(Bakery):
     )
 
     _pool: Pool = Cake(Pool, blank_page_after_use=False)
-    _selenium_client: SeleniumClient = Cake(
-        SeleniumClient,
+    _product_html_getter: ProductHtmlGetter = Cake(
+        ProductHtmlGetter,
+        pool=_pool,
+        timeout=settings.selenium_timeout,
+        executable_path=settings.selenium_executable_path,
+        binary_location=settings.selenium_binary_location,
+    )
+    _seller_html_getter: SellerHtmlGetter = Cake(
+        SellerHtmlGetter,
         pool=_pool,
         timeout=settings.selenium_timeout,
         executable_path=settings.selenium_executable_path,
@@ -46,17 +56,24 @@ class Container(Bakery):
         characteristics_parser=_product_characteristics_parser,
     )
 
+    _seller_parser: SellerParser = Cake(SellerParser, html_getter=_seller_html_getter)
+
     _product_service: ProductService = Cake(
         ProductService,
         product_parser=_product_parser,
-        html_getter=_selenium_client,
+        html_getter=_product_html_getter,
         publisher=_parsed_product_mq_publisher,
+    )
+    _seller_service: SellerService = Cake(
+        SellerService,
+        product_service=_product_service,
+        seller_parser=_seller_parser,
     )
     _services_by_entity_types: Mapping[EntityType, IService | None] = Cake(
         {
             "PRODUCT": _product_service,
             "CATEGORY": None,
-            "SELLER": None,
+            "SELLER": _seller_service,
             "BRAND": None,
         },
     )

@@ -10,7 +10,7 @@ from selenium_async.pool import Pool  # type: ignore[import-untyped]
 from ozon_parser.interfaces import ILogger
 
 
-class SeleniumClient:
+class ProductHtmlGetter:
     def __init__(self, *, pool: Pool, executable_path: str, binary_location: str, timeout: float = 10.0) -> None:
         self.pool: Pool = pool
         self.timeout: float = timeout
