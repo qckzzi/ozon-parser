@@ -29,8 +29,8 @@ class ProductHtmlGetter:
         )
         def _get_html(url: str) -> str:
             page_source: str
+            driver: uc.Chrome = uc.Chrome()
             try:
-                driver: uc.Chrome = uc.Chrome()
                 driver.get(url)
                 WebDriverWait(driver, self.timeout).until(
                     ec.presence_of_element_located((By.XPATH, '//div[@id="section-characteristics"]')),
