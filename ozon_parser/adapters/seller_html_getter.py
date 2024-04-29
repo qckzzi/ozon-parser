@@ -1,42 +1,54 @@
-from backoff import expo, on_exception
-from selenium.common.exceptions import TimeoutException
+import time
+
+import backoff
+import undetected_chromedriver as uc  # type: ignore[import-untyped]
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium_async import run_sync  # type: ignore[import-untyped]
-from selenium_async.pool import Pool  # type: ignore[import-untyped]
+from undetected_chromedriver.webelement import WebElement  # type: ignore[import-untyped]
 
 from ozon_parser.interfaces import ILogger
 
 
 class SellerHtmlGetter:
-    def __init__(self, *, pool: Pool, executable_path: str, binary_location: str, timeout: float = 10.0) -> None:
-        self.pool: Pool = pool
+    def __init__(self, *, timeout: float = 10.0) -> None:
         self.timeout: float = timeout
-        self.executable_path: str = executable_path
-        self.binary_location: str = binary_location
 
     def __str__(self) -> str:
         return f"[{self.__class__.__name__}]"
 
-    async def get_html(self, url: str, logger: ILogger | None = None) -> str:
+    def get_html(self, url: str, logger: ILogger | None = None) -> str:
         if logger:
             logger.debug(f"{self} fetches html from {url=}")
 
-        @on_exception(expo, TimeoutException, max_tries=3, logger=logger)  # type: ignore[arg-type]
-        def _get_html(driver: WebDriver) -> str:
-            driver.get(url)
-            driver.get(url)
-            WebDriverWait(driver, self.timeout).until(
-                ec.presence_of_element_located((By.XPATH, '//div[@data-widget="searchResultsV2"]')),
-            )
-
-            return driver.page_source
-
-        return await run_sync(
-            _get_html,
-            pool=self.pool,
-            executable_path=self.executable_path,
-            binary_location=self.binary_location,
+        @backoff.on_exception(
+            backoff.expo,
+            (TimeoutException, NoSuchElementException),
+            max_tries=3,
+            logger=logger,  # type: ignore[arg-type]
         )
+        def _get_html(url: str) -> str:
+            page_source: str
+            try:
+                options: uc.ChromeOption = uc.ChromeOptions()
+                driver: uc.Chrome = uc.Chrome(options=options)
+                driver.get(url)
+                WebDriverWait(driver, self.timeout).until(
+                    ec.presence_of_element_located((By.XPATH, '//div[@data-widget="searchResultsV2"]')),
+                )
+                page_source = driver.page_source
+            except TimeoutException:
+                button: WebElement = driver.find_element(value="reload-button")
+                time.sleep(1)
+                button.click()
+                WebDriverWait(driver, self.timeout).until(
+                    ec.presence_of_element_located((By.XPATH, '//div[@data-widget="searchResultsV2"]')),
+                )
+                page_source = driver.page_source
+            finally:
+                driver.quit()
+
+            return page_source
+
+        return _get_html(url)

@@ -22,7 +22,7 @@ class ProductService:
         if logger:
             logger.debug(f"{self} processes {url=}")
 
-        html: str = await self.html_getter.get_html(url=url.unicode_string(), logger=logger)
+        html: str = self.html_getter.get_html(url=url.unicode_string(), logger=logger)
         product: IProduct = self.parser.parse(html)
 
         if logger:

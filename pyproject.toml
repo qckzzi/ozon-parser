@@ -13,8 +13,8 @@ faststream = {extras = ["rabbit"], version = "^0.4.7"}
 fresh-bakery = "^0.3.3"
 backoff = "^2.2.1"
 beautifulsoup4 = "^4.12.3"
-selenium-async = { git = "https://github.com/qckzzi/python-selenium-async" }
 selenium = "^4.19.0"
+undetected-chromedriver = "^3.5.5"
 
 
 [tool.poetry.group.dev.dependencies]

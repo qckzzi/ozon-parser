@@ -18,7 +18,7 @@ class SellerParser:
         return f"[{self.__class__.__name__}]"
 
     async def parse(self, url: str, logger: ILogger | None = None) -> Sequence[str]:
-        html: str = await self.html_getter.get_html(url, logger)
+        html: str = self.html_getter.get_html(url, logger)
         raw_total_pages: re.Match[str] | None = re.search(r'"totalPages":(\d+)', html)
 
         if not raw_total_pages:
@@ -45,7 +45,7 @@ class SellerParser:
         return list(set(urls))
 
     async def _parse(self, url: str, logger: ILogger | None = None) -> list[str]:
-        html: str = await self.html_getter.get_html(url, logger)
+        html: str = self.html_getter.get_html(url, logger)
         soup: BeautifulSoup = BeautifulSoup(html, "html.parser")
 
         product_tags: ResultSet = soup.find_all("a", attrs={"class": "yi6"})

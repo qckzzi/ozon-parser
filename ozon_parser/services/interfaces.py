@@ -23,7 +23,7 @@ class IProductParser(Protocol):
 
 
 class IHtmlGetter(Protocol):
-    async def get_html(self, url: str, logger: ILogger | None = None) -> str: ...
+    def get_html(self, url: str, logger: ILogger | None = None) -> str: ...
 
 
 class IPublishedCharacteristic(TypedDict):

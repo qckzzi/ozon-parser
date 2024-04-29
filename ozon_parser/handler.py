@@ -31,4 +31,4 @@ class ParsingHandler:
             logger.warning(f"Service for {entity_type=} is not implemented.")
             return
 
-        await service(url, logger)
+        await service(url, logger)  # type: ignore[arg-type]

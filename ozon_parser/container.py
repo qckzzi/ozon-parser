@@ -2,7 +2,6 @@ from collections.abc import Mapping, Sequence
 
 from bakery import Bakery, Cake
 from faststream.rabbit import RabbitBroker, RabbitQueue, RabbitRoute, RabbitRouter
-from selenium_async.pool import Pool  # type: ignore[import-untyped]
 
 from ozon_parser.adapters.product_html_getter import ProductHtmlGetter
 from ozon_parser.adapters.seller_html_getter import SellerHtmlGetter
@@ -29,21 +28,13 @@ class Container(Bakery):
         broker,
         settings.parsed_loading_queue,
     )
-
-    _pool: Pool = Cake(Pool, blank_page_after_use=False)
     _product_html_getter: ProductHtmlGetter = Cake(
         ProductHtmlGetter,
-        pool=_pool,
         timeout=settings.selenium_timeout,
-        executable_path=settings.selenium_executable_path,
-        binary_location=settings.selenium_binary_location,
     )
     _seller_html_getter: SellerHtmlGetter = Cake(
         SellerHtmlGetter,
-        pool=_pool,
         timeout=settings.selenium_timeout,
-        executable_path=settings.selenium_executable_path,
-        binary_location=settings.selenium_binary_location,
     )
 
     _product_main_data_parser: ProductMainDataParser = Cake(ProductMainDataParser)
